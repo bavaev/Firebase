@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 
 import 'package:firebase/business/models/item.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class ItemState extends Equatable {
   const ItemState();

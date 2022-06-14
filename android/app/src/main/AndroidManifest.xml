@@ -2,7 +2,7 @@
     package="com.example.new17">
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
    <application
-        android:label="new17"
+        android:label="firebase"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

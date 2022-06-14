@@ -1,6 +1,5 @@
 import 'package:firebase/business/bloc/event.dart';
 import 'package:firebase/business/bloc/state.dart';
-import 'package:firebase/login.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase/ui/widgets/item_card.dart';
@@ -58,7 +57,7 @@ class _ListItemsState extends State<ListItems> {
             Text(widget.title),
             IconButton(
               onPressed: (() {
-                context.read<ItemBloc>().add(const AuthenticateEvent(true));
+                context.read<ItemBloc>().add(const AuthenticateEvent(true, '', ''));
               }),
               icon: const Icon(Icons.logout),
             ),

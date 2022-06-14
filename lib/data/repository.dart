@@ -1,18 +1,19 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:firebase/business/models/item.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class ItemRepository {
   Stream<List<Item>> purchases();
 
   void dispose();
   void data(bool sort);
-  void auth(bool login);
+  void registration(String email, String password);
+  void auth(bool login, String email, String password);
+  void googleAuth(bool login);
   void add(String value);
   void update(String id, bool value);
 }
@@ -27,21 +28,67 @@ class ItemRepositoryFirestore extends ItemRepository {
   }
 
   @override
-  Future<UserCredential?> auth(bool login) async {
+  void registration(String email, String password) async {
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  Future<UserCredential?> auth(bool login, String email, String password) async {
     if (login) {
       await FirebaseAuth.instance.signOut();
     } else {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-        return await FirebaseAuth.instance.signInWithCredential(credential);
+      try {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          print('No user found for that email.');
+        } else if (e.code == 'wrong-password') {
+          print('Wrong password provided for that user.');
+        }
       }
     }
+    return null;
+  }
+
+  @override
+  Future<UserCredential?> googleAuth(bool login) async {
+    if (login) {
+      await FirebaseAuth.instance.signOut();
+    } else {
+      if (kIsWeb) {
+        GoogleAuthProvider googleProvider = GoogleAuthProvider();
+
+        googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+        googleProvider.setCustomParameters({'login_hint': 'user@example.com'});
+
+        return await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      } else {
+        final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+        if (googleUser != null) {
+          final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+          final credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
+          return await FirebaseAuth.instance.signInWithCredential(credential);
+        }
+      }
+    }
+    return null;
   }
 
   @override
