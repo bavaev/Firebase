@@ -1,16 +1,7 @@
-# new17
+# Firebase
 
-A new Flutter project.
+## Приложение списка покупок с firebase БД.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+В приложении реализованы подключение к Firebase, аутентификация Email/Password, Google, загрузка фонового изображения с Firebase Storage, сортировка и фильтрация.
+В качестве State Management используется библиотека flutter_bloc.
+Приложение протестировано в Android, iOS, Web.
