@@ -93,7 +93,12 @@ class ItemRepositoryFirestore extends ItemRepository {
 
   @override
   void data(bool sort) {
-    FirebaseFirestore.instance.collection('purchases').orderBy('name', descending: sort).snapshots().listen((techniques) {
+    FirebaseFirestore.instance
+        .collection('purchases')
+        .orderBy('name', descending: sort)
+        // .where('purchased', isEqualTo: filter)
+        .snapshots()
+        .listen((techniques) {
       _cache.clear();
       techniques.docs.forEach((item) {
         _cache.add(Item(id: item.id, name: item['name'], purchased: item['purchased']));
