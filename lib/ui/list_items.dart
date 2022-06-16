@@ -1,12 +1,15 @@
-import 'package:firebase/business/bloc/event.dart';
-import 'package:firebase/business/bloc/state.dart';
+import 'package:firebase/business/models/item.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase/ui/widgets/item_card.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:firebase/business/bloc/bloc.dart';
+import 'package:firebase/business/bloc/item_bloc/item_bloc.dart';
+import 'package:firebase/business/bloc/item_bloc/item_event.dart';
+import 'package:firebase/business/bloc/item_bloc/item_state.dart';
+import 'package:firebase/business/bloc/auth_bloc/auth_bloc.dart';
+import 'package:firebase/business/bloc/auth_bloc/auth_event.dart';
 
 class ListItems extends StatefulWidget {
   const ListItems({Key? key, required this.title}) : super(key: key);
@@ -19,10 +22,16 @@ class ListItems extends StatefulWidget {
 class _ListItemsState extends State<ListItems> {
   final _text = TextEditingController();
   bool? order;
+  late Future imageUrl;
 
-  Future<String> getImage() async {
-    final imageUrl = await FirebaseStorage.instance.refFromURL('gs://fir-23c0b.appspot.com/priroda-zima-derevo-sneg-solntse.jpg').getDownloadURL();
-    return imageUrl;
+  @override
+  void initState() {
+    super.initState();
+    imageUrl = getImage();
+  }
+
+  Future getImage() async {
+    return await FirebaseStorage.instance.refFromURL('gs://fir-23c0b.appspot.com/priroda-zima-derevo-sneg-solntse.jpg').getDownloadURL();
   }
 
   List<dynamic> filter(List<dynamic> data) {
@@ -47,17 +56,17 @@ class _ListItemsState extends State<ListItems> {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<ItemBloc>().state;
     final blocContext = BlocProvider.of<ItemBloc>(context);
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(widget.title),
             IconButton(
               onPressed: (() {
-                context.read<ItemBloc>().add(const AuthenticateEvent(true, '', ''));
+                context.read<AuthBloc>().add(const AuthenticateEvent(true, '', ''));
               }),
               icon: const Icon(Icons.logout),
             ),
@@ -76,7 +85,6 @@ class _ListItemsState extends State<ListItems> {
                     IconButton(
                       onPressed: (() {
                         blocContext.add(const SortUpEvent(false));
-                        setState(() {});
                       }),
                       icon: const Icon(Icons.keyboard_arrow_up),
                       iconSize: 50,
@@ -84,7 +92,6 @@ class _ListItemsState extends State<ListItems> {
                     IconButton(
                       onPressed: (() {
                         blocContext.add(const SortDownEvent(true));
-                        setState(() {});
                       }),
                       icon: const Icon(Icons.keyboard_arrow_down),
                       iconSize: 50,
@@ -96,16 +103,18 @@ class _ListItemsState extends State<ListItems> {
                     order ?? true
                         ? IconButton(
                             onPressed: () {
-                              order = false;
-                              setState(() {});
+                              setState(() {
+                                order = false;
+                              });
                             },
                             icon: const Icon(Icons.check_box_outline_blank),
                             iconSize: 40,
                           )
                         : IconButton(
                             onPressed: () {
-                              order = true;
-                              setState(() {});
+                              setState(() {
+                                order = true;
+                              });
                             },
                             icon: const Icon(Icons.check_box),
                             iconSize: 40,
@@ -117,24 +126,27 @@ class _ListItemsState extends State<ListItems> {
           ),
           Expanded(
             child: FutureBuilder(
-              future: getImage(),
+              future: imageUrl,
               builder: (context, AsyncSnapshot snapshot) {
                 if (snapshot.hasData) {
                   return Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(snapshot.data),
-                        fit: BoxFit.cover,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(snapshot.data),
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                    child: state is ItemLoadedState
-                        ? ListView(
-                            children: filter(state.data).map((e) => ItemCard(item: e)).toList(),
-                          )
-                        : const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                  );
+                      child: BlocBuilder<ItemBloc, ItemState>(
+                        builder: (context, state) {
+                          return state is ItemLoadedState
+                              ? ListView(
+                                  children: filter(state.data).map((item) => ItemCard(item: item)).toList(),
+                                )
+                              : const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                        },
+                      ));
                 }
                 return Container();
               },
@@ -147,10 +159,10 @@ class _ListItemsState extends State<ListItems> {
           showModalBottomSheet(
             context: context,
             builder: (BuildContext context) {
-              return SizedBox(
-                height: 150,
+              return Container(
+                margin: const EdgeInsets.all(10),
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                   child: Row(
                     children: [
                       Expanded(

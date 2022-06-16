@@ -4,36 +4,6 @@ abstract class ItemEvent extends Equatable {
   const ItemEvent();
 }
 
-class RegistrationEvent extends ItemEvent {
-  const RegistrationEvent(this.email, this.password);
-
-  final String email;
-  final String password;
-
-  @override
-  List<Object> get props => [email, password];
-}
-
-class AuthenticateEvent extends ItemEvent {
-  const AuthenticateEvent(this.login, this.email, this.password);
-
-  final bool login;
-  final String email;
-  final String password;
-
-  @override
-  List<Object> get props => [login, email, password];
-}
-
-class AuthenticateGoogleEvent extends ItemEvent {
-  const AuthenticateGoogleEvent(this.login);
-
-  final bool login;
-
-  @override
-  List<Object> get props => [login];
-}
-
 class GetDataEvent extends ItemEvent {
   @override
   List<Object> get props => [];

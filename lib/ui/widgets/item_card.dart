@@ -1,10 +1,10 @@
-import 'package:firebase/business/bloc/bloc.dart';
-import 'package:firebase/business/bloc/event.dart';
-import 'package:firebase/business/bloc/state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:firebase/business/models/item.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase/business/bloc/item_bloc/item_bloc.dart';
+import 'package:firebase/business/bloc/item_bloc/item_event.dart';
+import 'package:firebase/business/bloc/item_bloc/item_state.dart';
 
 class ItemCard extends StatelessWidget {
   final Item item;

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:firebase/business/bloc/bloc.dart';
-import 'package:firebase/business/bloc/event.dart';
+import 'package:firebase/business/bloc/auth_bloc/auth_bloc.dart';
+import 'package:firebase/business/bloc/auth_bloc/auth_event.dart';
 import 'package:firebase/ui/list_items.dart';
 
 class Login extends StatelessWidget {
@@ -22,49 +22,60 @@ class Login extends StatelessWidget {
             appBar: AppBar(
               title: const Text('Войти'),
             ),
-            body: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextField(
-                  controller: _email,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Email',
-                  ),
+            body: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _email,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Email',
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    TextField(
+                      controller: _password,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Пароль',
+                      ),
+                    ),
+                    ElevatedButton(
+                      child: const Text('Войти'),
+                      onPressed: () {
+                        context.read<AuthBloc>().add(AuthenticateEvent(false, _email.text, _password.text));
+                      },
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    ElevatedButton(
+                      child: const Text('Войти с Google'),
+                      onPressed: () {
+                        context.read<AuthBloc>().add(const AuthenticateGoogleEvent(false));
+                      },
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    const Text('Нет аккаунта?'),
+                    ElevatedButton(
+                      child: const Text('Зарегистрироваться'),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ListItems(title: 'Firebase'),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(
-                  height: 50,
-                ),
-                TextField(
-                  controller: _password,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Пароль',
-                  ),
-                ),
-                ElevatedButton(
-                  child: const Text('Войти'),
-                  onPressed: () {
-                    context.read<ItemBloc>().add(AuthenticateEvent(false, _email.text, _password.text));
-                  },
-                ),
-                ElevatedButton(
-                  child: const Text('Войти с Google'),
-                  onPressed: () {
-                    context.read<ItemBloc>().add(const AuthenticateGoogleEvent(false));
-                  },
-                ),
-                const SizedBox(
-                  height: 100,
-                ),
-                const Text('Нет аккаунта?'),
-                ElevatedButton(
-                  child: const Text('Зарегистрироваться'),
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/registration');
-                  },
-                ),
-              ],
+              ),
             ),
           );
         } else {

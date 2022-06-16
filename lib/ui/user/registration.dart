@@ -1,8 +1,8 @@
-import 'package:firebase/business/bloc/event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:firebase/business/bloc/bloc.dart';
+import 'package:firebase/business/bloc/auth_bloc/auth_bloc.dart';
+import 'package:firebase/business/bloc/auth_bloc/auth_event.dart';
 
 class RegistrationPage extends StatelessWidget {
   RegistrationPage({Key? key}) : super(key: key);
@@ -45,7 +45,7 @@ class RegistrationPage extends StatelessWidget {
               builder: (context) => ElevatedButton(
                 child: const Text('Зарегистрироваться'),
                 onPressed: () {
-                  context.read<ItemBloc>().add(RegistrationEvent(_email.text, _password.text));
+                  context.read<AuthBloc>().add(RegistrationEvent(_email.text, _password.text));
                   Navigator.pushNamed(context, '/login');
                 },
               ),

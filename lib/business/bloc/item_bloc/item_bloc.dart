@@ -1,18 +1,15 @@
-import 'package:firebase/data/repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'state.dart';
-import 'event.dart';
+import 'item_state.dart';
+import 'item_event.dart';
 import 'package:firebase/business/models/item.dart';
+import 'package:firebase/data/repository.dart';
 
 class ItemBloc extends Bloc<ItemEvent, ItemState> {
   final ItemRepository repository;
 
   @override
   ItemBloc(this.repository) : super(ItemLoadingState()) {
-    on<RegistrationEvent>(_registration);
-    on<AuthenticateEvent>(_auth);
-    on<AuthenticateGoogleEvent>(_authGoogle);
     on<GetDataEvent>((event, emit) async {
       await emit.forEach(
         repository.purchases(),
@@ -27,24 +24,14 @@ class ItemBloc extends Bloc<ItemEvent, ItemState> {
     on<ChangeStateEvent>(_changeState);
   }
 
-  void _registration(event, emit) {
-    repository.registration(event.email, event.password);
-  }
-
-  void _auth(event, emit) async {
-    repository.auth(event.login, event.email, event.password);
-  }
-
-  void _authGoogle(event, emit) async {
-    repository.googleAuth(event.login);
-  }
-
   void _sortUp(event, emit) {
     repository.data(event.sort);
+    emit(ItemLoadingState());
   }
 
   void _sortDown(event, emit) {
     repository.data(event.sort);
+    emit(ItemLoadingState());
   }
 
   void _addDoc(event, emit) async {

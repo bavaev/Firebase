@@ -12,9 +12,9 @@ class ItemLoadingState extends ItemState {
 }
 
 class ItemLoadedState extends ItemState {
-  const ItemLoadedState(this.data);
-
   final List<Item> data;
+
+  const ItemLoadedState(this.data);
 
   @override
   List<Object> get props => [data];
