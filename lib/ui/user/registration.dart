@@ -12,7 +12,6 @@ class RegistrationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final blocContext = BlocProvider.of<ItemBloc>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Регистрация'),
